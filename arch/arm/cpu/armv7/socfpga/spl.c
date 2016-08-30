@@ -67,17 +67,30 @@ void board_init_f(ulong dummy)
 	board_init_r(NULL, 0);
 }
 
+const u32 boot_priority[] = {
+#if (CONFIG_PRELOADER_BOOT_FROM_SDMMC == 1)
+	BOOT_DEVICE_MMC1,
+#endif
+#if (CONFIG_PRELOADER_BOOT_FROM_QSPI == 1)
+	BOOT_DEVICE_SPI,
+#endif
+#if (CONFIG_PRELOADER_BOOT_FROM_NAND == 1)
+	BOOT_DEVICE_NAND,
+#endif
+#if (CONFIG_PRELOADER_BOOT_FROM_RAM == 1)
+	BOOT_DEVICE_RAM,
+#endif
+	BOOT_DEVICE_NONE };
+
+
 u32 spl_boot_device(void)
 {
-#if (CONFIG_PRELOADER_BOOT_FROM_QSPI == 1)
-	return BOOT_DEVICE_SPI;
-#elif (CONFIG_PRELOADER_BOOT_FROM_RAM == 1)
-	return BOOT_DEVICE_RAM;
-#elif (CONFIG_PRELOADER_BOOT_FROM_NAND == 1)
-	return BOOT_DEVICE_NAND;
-#else
-	return BOOT_DEVICE_MMC1;
-#endif
+	static u32 device = 0;
+
+	if (boot_priority[device] == BOOT_DEVICE_NONE)
+		device = 0;
+
+	return boot_priority[device++];
 }
 
 /* sdmmc boot mode is raw instead fat */

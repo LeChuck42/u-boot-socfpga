@@ -189,13 +189,13 @@ void spl_mmc_load_image(void)
 	mmc = find_mmc_device(0);
 	if (!mmc) {
 		puts("spl: mmc device not found!!\n");
-		hang();
+		return;
 	}
 
 	err = mmc_init(mmc);
 	if (err) {
 		printf("spl: mmc init failed: err - %d\n", err);
-		hang();
+		return;
 	}
 	boot_mode = spl_boot_mode();
 	if (boot_mode == MMCSD_MODE_RAW) {

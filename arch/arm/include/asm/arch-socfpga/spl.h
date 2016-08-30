@@ -40,6 +40,7 @@ extern u32 rst_mgr_status __attribute__ ((section(".data")));
 void relocate_stack_to_sdram(void);
 #endif
 
+#define BOOT_DEVICE_NONE 0
 #define BOOT_DEVICE_RAM 1
 #define BOOT_DEVICE_SPI 2
 #define BOOT_DEVICE_MMC1 3
