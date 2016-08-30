@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2015 Altera Corporation <www.altera.com>
+ *  Copyright (C) 2012 Altera Corporation <www.altera.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,24 @@
 
 #include "altlimits.h"
 
+#if !defined(CONFIG_HPS_SDR_CTRLCFG_CTRLCFG_ECCEN)
+	#error ECCEN is not defined
+#endif
+
+#if !defined(CONFIG_PRELOADER_SDRAM_SCRUBBING)
+	#error SDRAM Scrubbing is not defined
+#endif
+
+#if (CONFIG_HPS_SDR_CTRLCFG_CTRLCFG_ECCEN == 1)
+	#if (CONFIG_PRELOADER_SDRAM_SCRUBBING == 0)
+		#error If ECC is enabled, Scrubbing should also be enabled.
+	#endif
+#elif (CONFIG_HPS_SDR_CTRLCFG_CTRLCFG_ECCEN == 0)
+	#if (CONFIG_PRELOADER_SDRAM_SCRUBBING == 1)
+		#error If ECC is disabled, Scrubbing should also be disabled.
+	#endif
+#endif
+
 /*
  * SDRAM MMR init skip read back/verify steps
  * Define to speed up the MMR init process by just write without verifying
@@ -48,7 +66,13 @@
 DECLARE_GLOBAL_DATA_PTR;
 
 unsigned long irq_cnt_ecc_sdram;
-u8 pl330_buf[2500];
+
+#if (CONFIG_PRELOADER_SDRAM_SCRUB_REMAIN_REGION == 1)
+struct pl330_transfer_struct pl330_0;
+struct pl330_transfer_struct pl330_1;
+u8 pl330_buf0[100];
+u8 pl330_buf1[1500];
+#endif
 
 /* Initialise the DRAM by telling the DRAM Size. */
 int dram_init(void)
@@ -504,12 +528,6 @@ defined(CONFIG_HPS_SDR_CTRLCFG_CTRLCFG_NODMPINS)
 			CONFIG_HPS_SDR_CTRLCFG_CTRLCFG_NODMPINS,
 			SDR_CTRLGRP_CTRLCFG_NODMPINS_LSB,
 			SDR_CTRLGRP_CTRLCFG_NODMPINS_MASK);
-#endif
-#if (CONFIG_HPS_SDR_CTRLCFG_CTRLCFG_ECCEN == 1)
-	/* Enable ECC overwrites if ECC is enabled */
-	reg_value = sdram_write_register_field(reg_value, 0x1,
-		SDR_CTRLGRP_CTRLCFG_CFG_ENABLE_ECC_CODE_OVERWRITES_LSB,
-		SDR_CTRLGRP_CTRLCFG_CFG_ENABLE_ECC_CODE_OVERWRITES_MASK);
 #endif
 	if (sdram_write_verify(register_offset,	reg_value) == 1) {
 		status = 1;
@@ -1520,19 +1538,25 @@ unsigned long sdram_calculate_size(void)
 	return temp;
 }
 
-/* init the whole SDRAM ECC bit */
-void sdram_ecc_init(void)
+#if (CONFIG_PRELOADER_SDRAM_SCRUBBING == 1)
+
+/* Scrubbing the memory region used for boot image storing */
+void sdram_scrub_boot_region(void)
 {
 	struct pl330_transfer_struct pl330;
+	u8 buf[100];
 	unsigned int start;
 
-	pl330.dst_addr = CONFIG_SYS_SDRAM_BASE;
-	pl330.size_byte = sdram_calculate_size();
+	pl330.dst_addr = CONFIG_PRELOADER_SDRAM_SCRUB_BOOT_REGION_START;
+	pl330.size_byte = CONFIG_PRELOADER_SDRAM_SCRUB_BOOT_REGION_END -
+		CONFIG_PRELOADER_SDRAM_SCRUB_BOOT_REGION_START;
 	pl330.channel_num = 0;
-	pl330.buf_size = sizeof(pl330_buf);
-	pl330.buf = pl330_buf;
+	pl330.buf_size = sizeof(buf);
+	pl330.buf = buf;
 
-	puts("SDRAM: Initializing SDRAM ECC\n");
+	printf("SDRAM: Scrubbing 0x%08x - 0x%08x\n",
+		CONFIG_PRELOADER_SDRAM_SCRUB_BOOT_REGION_START,
+		CONFIG_PRELOADER_SDRAM_SCRUB_BOOT_REGION_END);
 	reset_timer();
 	start = get_timer(0);
 
@@ -1551,6 +1575,133 @@ void sdram_ecc_init(void)
 		hang();
 	}
 
-	printf("SDRAM: ECC initialized successfully with %d ms\n",
+	printf("SDRAM: Scrubbing success with %d ms\n",
 		(unsigned)get_timer(start));
 }
+
+#if (CONFIG_PRELOADER_SDRAM_SCRUB_REMAIN_REGION == 1)
+
+/* Scrubbing the remaining memory region */
+void sdram_scrub_remain_region_trigger(void)
+{
+	unsigned int sdram_size;
+
+	pl330_0.size_byte = 0;
+	pl330_1.size_byte = 0;
+
+
+	/* check whether we need to scrub the memory before the boot region */
+	if (CONFIG_PRELOADER_SDRAM_SCRUB_BOOT_REGION_START !=
+		CONFIG_SYS_SDRAM_BASE) {
+		/* we need scrub it */
+		pl330_0.dst_addr = CONFIG_SYS_SDRAM_BASE;
+		pl330_0.size_byte =
+			CONFIG_PRELOADER_SDRAM_SCRUB_BOOT_REGION_START -
+			CONFIG_SYS_SDRAM_BASE;
+		pl330_0.channel_num = 0;
+		pl330_0.buf_size = sizeof(pl330_buf0);
+		pl330_0.buf = pl330_buf0;
+
+		printf("SDRAM: Scrubbing 0x%08x - 0x%08x\n",
+			CONFIG_SYS_SDRAM_BASE,
+			CONFIG_PRELOADER_SDRAM_SCRUB_BOOT_REGION_START);
+
+		if (pl330_transfer_zeroes(&pl330_0)) {
+			puts("ERROR - DMA setup 0 failed\n");
+			hang();
+		}
+
+		if (pl330_transfer_start(&pl330_0)) {
+			puts("ERROR - DMA start 0 failed\n");
+			hang();
+		}
+	}
+
+#ifdef CONFIG_HW_WATCHDOG
+	WATCHDOG_RESET();
+#endif
+	/* check whether we need to scrub the memory after the boot region */
+	sdram_size = sdram_calculate_size();
+
+	if (CONFIG_PRELOADER_SDRAM_SCRUB_BOOT_REGION_END !=
+		(CONFIG_SYS_SDRAM_BASE + sdram_size)) {
+		/* we need scrub it */
+		pl330_1.dst_addr = CONFIG_PRELOADER_SDRAM_SCRUB_BOOT_REGION_END;
+		pl330_1.size_byte = CONFIG_SYS_SDRAM_BASE + sdram_size -
+			CONFIG_PRELOADER_SDRAM_SCRUB_BOOT_REGION_END;
+		pl330_1.channel_num = 1;
+		pl330_1.buf_size = sizeof(pl330_buf1);
+		pl330_1.buf = pl330_buf1;
+
+		printf("SDRAM: Scrubbing 0x%08x - 0x%08x\n",
+			CONFIG_PRELOADER_SDRAM_SCRUB_BOOT_REGION_END,
+			(CONFIG_SYS_SDRAM_BASE + sdram_size));
+
+		if (pl330_transfer_zeroes(&pl330_1)) {
+			puts("ERROR - DMA setup 1 failed\n");
+			hang();
+		}
+
+		if (pl330_transfer_start(&pl330_1)) {
+			puts("ERROR - DMA start 1 failed\n");
+			hang();
+		}
+	}
+
+#ifdef CONFIG_HW_WATCHDOG
+	WATCHDOG_RESET();
+#endif
+}
+
+/* Checking whether the scrubbing the remaining memory region finish? */
+void sdram_scrub_remain_region_finish(void)
+{
+	unsigned long ddr_scrub_time;
+
+#ifdef CONFIG_HW_WATCHDOG
+	WATCHDOG_RESET();
+#endif
+
+	reset_timer();
+	ddr_scrub_time = get_timer(0);
+
+	/* always poll for smallest transfer first */
+	if (pl330_1.size_byte > pl330_0.size_byte) {
+		if (pl330_0.size_byte != 0)
+			if (pl330_transfer_finish(&pl330_0)) {
+				puts("ERROR - DMA 0 finish failed\n");
+				hang();
+			}
+#ifdef CONFIG_HW_WATCHDOG
+		WATCHDOG_RESET();
+#endif
+		if (pl330_1.size_byte != 0)
+			if (pl330_transfer_finish(&pl330_1)) {
+				puts("ERROR - DMA 1 finish failed\n");
+				hang();
+			}
+	} else {
+		if (pl330_1.size_byte != 0)
+			if (pl330_transfer_finish(&pl330_1)) {
+				puts("ERROR - DMA 1 finish failed\n");
+				hang();
+			}
+#ifdef CONFIG_HW_WATCHDOG
+		WATCHDOG_RESET();
+#endif
+		if (pl330_0.size_byte != 0)
+			if (pl330_transfer_finish(&pl330_0)) {
+				puts("ERROR - DMA 0 finish failed\n");
+				hang();
+			}
+	}
+	printf("SDRAM: Scrubbing success with consuming additional %d ms\n",
+		(unsigned)get_timer(ddr_scrub_time));
+
+#ifdef CONFIG_HW_WATCHDOG
+	WATCHDOG_RESET();
+#endif
+}
+
+#endif /* CONFIG_PRELOADER_SDRAM_SCRUB_REMAIN_REGION */
+#endif /* CONFIG_PRELOADER_SDRAM_SCRUBBING */
