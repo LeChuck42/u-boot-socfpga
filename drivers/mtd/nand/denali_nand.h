@@ -1,6 +1,5 @@
 /*
  * NAND Flash Controller Device Driver
- * Copyright (C) 2013 Altera Corporation <www.altera.com>
  * Copyright (c) 2009 - 2010, Intel Corporation and its suppliers.
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -18,11 +17,12 @@
  *
  */
 
-typedef enum {false, true} bool;
-typedef int irqreturn_t;
+#ifndef __DENALI_H__
+#define __DENALI_H__
 
-#define IRQ_HANDLED				1
-#define IRQ_NONE				0
+#include <linux/mtd/nand.h>
+
+typedef enum {false, true} bool;
 
 #define DEVICE_RESET				0x0
 #define     DEVICE_RESET__BANK0				0x0001
@@ -180,6 +180,8 @@ typedef int irqreturn_t;
 
 #define REVISION				0x370
 #define     REVISION__VALUE				0xffff
+#define MAKE_COMPARABLE_REVISION(x)		swab16((x) & REVISION__VALUE)
+#define REVISION_5_1				0x00000501
 
 #define ONFI_DEVICE_FEATURES			0x380
 #define     ONFI_DEVICE_FEATURES__VALUE			0x003f
@@ -224,8 +226,11 @@ typedef int irqreturn_t;
  * configuration we only get interrupted when the error is uncorrectable.
  * Unfortunately this bit replaces INTR_STATUS__ECC_TRANSACTION_DONE from the
  * old IP.
+ * taken from patch by Jamie Iles <jamie at jamieiles.com>
+ *  support hardware with internal ECC fixup
  */
 #define     INTR_STATUS__ECC_UNCOR_ERR			0x0001
+
 #define     INTR_STATUS__ECC_TRANSACTION_DONE		0x0001
 #define     INTR_STATUS__ECC_ERR			0x0002
 #define     INTR_STATUS__DMA_CMD_COMP			0x0004
@@ -338,6 +343,11 @@ typedef int irqreturn_t;
 #define     CHNL_ACTIVE__CHANNEL2			0x0004
 #define     CHNL_ACTIVE__CHANNEL3			0x0008
 
+#define FLASH_BURST_LENGTH		0x770
+#define CHIP_INTERLEAVE_ENABLE_AND_ALLOW_INT_READS		0X780
+#define NO_OF_BLOCKS_PER_LUN		0X790
+#define LUN_STATUS_CMD		0X7A0
+
 #define ACTIVE_SRC_ID				0x800
 #define     ACTIVE_SRC_ID__VALUE			0x00ff
 
@@ -412,28 +422,6 @@ typedef int irqreturn_t;
 #define ONFI_BLOOM_TIME         1
 #define MODE5_WORKAROUND        0
 
-/* lld_nand.h */
-/*
- * NAND Flash Controller Device Driver
- * Copyright (c) 2009, Intel Corporation and its suppliers.
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
- *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along with
- * this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
- *
- */
-
-#ifndef _LLD_NAND_
-#define _LLD_NAND_
 
 #define MODE_00    0x00000000
 #define MODE_01    0x04000000
@@ -466,7 +454,6 @@ typedef int irqreturn_t;
 #define READ_WRITE_ENABLE_HIGH_COUNT    22
 
 #define ECC_SECTOR_SIZE     512
-
 #define DENALI_BUF_SIZE		(NAND_MAX_PAGESIZE + NAND_MAX_OOBSIZE)
 
 struct nand_buf {
@@ -484,7 +471,7 @@ struct nand_buf {
 struct denali_nand_info {
 	struct mtd_info mtd;
 	struct nand_chip *nand;
-
+	
 	int flash_bank; /* currently selected chip */
 	int status;
 	int platform;
@@ -497,8 +484,6 @@ struct denali_nand_info {
 	void __iomem *flash_mem;  /* Mapped io reg base address */
 
 	/* elements used by ISR */
-	/*struct completion complete;*/
-
 	uint32_t irq_status;
 	int irq_debug_array[32];
 	int idx;
@@ -512,4 +497,4 @@ struct denali_nand_info {
 	uint32_t max_banks;
 };
 
-#endif /*_LLD_NAND_*/
+#endif /* __DENALI_H__ */
