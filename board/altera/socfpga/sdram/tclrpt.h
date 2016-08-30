@@ -1,33 +1,33 @@
-/*
- * Copyright Altera Corporation (C) 2012-2014. All rights reserved
- *
- * SPDX-License-Identifier:    BSD-3-Clause
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *    * Redistributions of source code must retain the above copyright
- *      notice, this list of conditions and the following disclaimer.
- *    * Redistributions in binary form must reproduce the above copyright
- *      notice, this list of conditions and the following disclaimer in the
- *      documentation and/or other materials provided with the distribution.
- *    * Neither the name of Altera Corporation nor the
- *      names of its contributors may be used to endorse or promote products
- *      derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL ALTERA CORPORATION BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 #ifndef TCLRPT_H_
 #define TCLRPT_H_
+/*
+* Copyright Altera Corporation (C) 2012-2014. All rights reserved
+*
+* SPDX-License-Identifier:  BSD-3-Clause
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*  * Redistributions of source code must retain the above copyright
+*  notice, this list of conditions and the following disclaimer.
+*  * Redistributions in binary form must reproduce the above copyright
+*  notice, this list of conditions and the following disclaimer in the
+*  documentation and/or other materials provided with the distribution.
+*  * Neither the name of Altera Corporation nor the
+*  names of its contributors may be used to endorse or promote products
+*  derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+* ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+* DISCLAIMED. IN NO EVENT SHALL ALTERA CORPORATION BE LIABLE FOR ANY
+* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 
 #include "sequencer.h"
 
@@ -37,8 +37,8 @@
 #define TCLRPT_SET(item, value)
 #endif
 
-/* None of the rest of the file should be referenced if ENABLE_TCL_DEBUG is not
-set (although it's not a problem if it is, but this helps catch errors) */
+// None of the rest of the file should be referenced if ENABLE_TCL_DEBUG is not
+// set (although it's not a problem if it is, but this helps catch errors)
 #if ENABLE_TCL_DEBUG
 
 #define PRINTF_READ_BUFFER_SIZE 128/4
@@ -49,197 +49,199 @@ set (although it's not a problem if it is, but this helps catch errors) */
 #define DI_REPORT_FLAGS_READY 0x00000001
 #define DI_REPORT_FLAGS_DONE 0x00000002
 
-/******************************************************************************/
-/* TCL Commands  */
-/******************************************************************************/
-/* The wait command */
+//*****************************************************************************
+// TCL Commands
+//*****************************************************************************
+// The wait command
 #define TCLDBG_CMD_WAIT_CMD 1000
 
-/* No operation command */
+// No operation command
 #define TCLDBG_CMD_NOP 0
 
-/* Command response acknowledged */
+// Command response acknowledged
 #define TCLDBG_CMD_RESPONSE_ACK 1
 
-/* Run the full test */
+// Run the full test
 #define TCLDBG_RUN_FULLTEST 2
 
-/* Query the parameterization info */
+// Query the parameterization info
 #define TCLDBG_PARAM_INFO 3
 
-/* Query the status of calibration */
+// Query the status of calibration
 #define TCLDBG_CAL_STATUS 4
 
-/* Run memory calibration */
+// Run memory calibration
 #define TCLDBG_RUN_MEM_CALIBRATE 5
 
-/* Run pattern to generate eye diagrams */
+// Run pattern to generate eye diagrams
 #define TCLDBG_RUN_EYE_DIAGRAM_PATTERN 6
 
-/* Run full test and see how far we can push DQ delay on
-input and output sides */
+// Run full test and see how far we can push DQ delay on input and output sides
 #define TCLDBG_FIND_FULL_TEST_DQ 7
 
-/* Run full test and see how far we can push DQS delay on
-input and output sides */
+// Run full test and see how far we can push DQS delay on input and output sides
 #define TCLDBG_FIND_FULL_TEST_DQS 8
 
-/* Run full test and see how far we can push DM delay on output sides */
+// Run full test and see how far we can push DM delay on output sides
 #define TCLDBG_FIND_FULL_TEST_DM 9
 
-/* Query the margins found during read and write calibration */
+// Query the margins found during read and write calibration
 #define TCLDBG_QUERY_CALIB_MARGINS 10
 
-/* Query the settings applied during calibration on DQ pins */
+// Query the settings applied during calibration on DQ pins
 #define TCLDBG_QUERY_DQ_SETTINGS 11
 
-/* Query the settings applied during calibration on DQS groups */
+// Query the settings applied during calibration on DQS groups
 #define TCLDBG_QUERY_DQS_SETTINGS 12
 
-/* Query the state of the PHY. User mode or debug mode */
+// Query the state of the PHY. User mode or debug mode
 #define TCLDBG_QUERY_PHY_USER_DEBUG_MODE 13
 
-/* Mark all groups as being valid for calibration */
+// Mark all groups as being valid for calibration
 #define TCLDBG_MARK_ALL_DQS_GROUPS_AS_VALID 14
 
-/* Mark a specific group to be skipped for calibration */
+// Mark a specific group to be skipped for calibration
 #define TCLDBG_MARK_GROUP_AS_SKIP 15
 
-/* Query the DQS skip group mask */
+// Query the DQS skip group mask
 #define TCLDBG_QUERY_GROUP_AS_SKIP 16
 
-/* Mark all ranks as being valid for calibration */
+// Mark all ranks as being valid for calibration
 #define TCLDBG_MARK_ALL_RANKS_AS_VALID 17
 
-/* Mark a specific rank to be skipped for calibration */
+// Mark a specific rank to be skipped for calibration
 #define TCLDBG_MARK_RANK_AS_SKIP 18
 
-/* Query the rank skip mask */
+// Query the rank skip mask
 #define TCLDBG_QUERY_RANK_AS_SKIP 19
 
-/* Query the settings applied during calibration on DM pins */
+// Query the settings applied during calibration on DM pins
 #define TCLDBG_QUERY_DM_SETTINGS 20
 
-/* Enable the margining report as part of calibration */
+// Enable the margining report as part of calibration
 #define TCLDBG_ENABLE_MARGIN_REPORT 21
 
-/* Enable sweeping all groups of calibration */
+// Enable sweeping all groups of calibration
 #define TCLDBG_ENABLE_SWEEP_ALL_GROUPS 22
 
-/* Enable the guaranteed read test as part of calibration */
+// Enable the guaranteed read test as part of calibration
 #define TCLDBG_DISABLE_GUARANTEED_READ 23
 
-/* Enable/disable non-destructive calibration */
+// Enable/disable non-destructive calibration
 #define TCLDBG_SET_NON_DESTRUCTIVE_CALIBRATION 24
 
 #if ENABLE_DELAY_CHAIN_WRITE
-/* Set DQ D1 Delay (I/O buffer to input register) */
+// Set DQ D1 Delay (I/O buffer to input register)
 #define TCLDBG_SET_DQ_D1_DELAY 25
 
-/* Set DQ D5 Delay (output register to I/O buffer) */
+// Set DQ D5 Delay (output register to I/O buffer)
 #define TCLDBG_SET_DQ_D5_DELAY 26
 
-/* Set DQ D6 Delay (output register to I/O buffer) */
+// Set DQ D6 Delay (output register to I/O buffer)
 #define TCLDBG_SET_DQ_D6_DELAY 27
 
-/* Set DQS D4 Delay (DQS delay chain) */
+// Set DQS D4 Delay (DQS delay chain)
 #define TCLDBG_SET_DQS_D4_DELAY 28
 
-/* Set DQS DQ Output Phase (deg) */
+// Set DQS DQ Output Phase (deg)
 #define TCLDBG_SET_DQDQS_OUTPUT_PHASE 29
 
-/* Set DQS D5 Delay (output register to I/O buffer) */
+// Set DQS D5 Delay (output register to I/O buffer)
 #define TCLDBG_SET_DQS_D5_DELAY 30
 
-/* Set DQS D6 Delay (output register to I/O buffer) */
+// Set DQS D6 Delay (output register to I/O buffer)
 #define TCLDBG_SET_DQS_D6_DELAY 31
 
-/* Set DQS DQS Enable Phase (deg) */
+// Set DQS DQS Enable Phase (deg)
 #define TCLDBG_SET_DQS_EN_PHASE 32
 
-/* Set DQS T11 Delay (DQS post-amble delay) */
+// Set DQS T11 Delay (DQS post-amble delay)
 #define TCLDBG_SET_DQS_T11_DELAY 33
 
-/* Set DM D5 Delay (output register to I/O buffer) */
+// Set DM D5 Delay (output register to I/O buffer)
 #define TCLDBG_SET_DM_D5_DELAY 34
 
-/* Set DM D6 Delay (output register to I/O buffer) */
+// Set DM D6 Delay (output register to I/O buffer)
 #define TCLDBG_SET_DM_D6_DELAY 35
 
-/* Rerun DQ margining without calibrating */
+// Rerun DQ margining without calibrating
 #define TCLDBG_REMARGIN_DQ 36
 
-/* Rerun DM margining without calibrating */
+// Rerun DM margining without calibrating
 #define TCLDBG_REMARGIN_DM 37
 
-/* Increment VFIFO */
+// Increment VFIFO
 #define TCLDBG_INCR_VFIFO 38
 
-/* Decrement VFIFO */
+// Decrement VFIFO
 #define TCLDBG_DECR_VFIFO 39
 
-/* Select shadow register */
+// Select shadow register
 #define TCLDBG_SELECT_SHADOW_REG 40
 
-#endif /* ENABLE_DELAY_CHAIN_WRITE */
+#endif // ENABLE_DELAY_CHAIN_WRITE
 
-/*****************************************************************************/
-/* TCL RX Status Codes	*/
-/*****************************************************************************/
-/* RX interface waiting for command */
+// Update RDIMM Control Word
+#define TCLDBG_SET_UPDATE_PARAMETERS 41
+
+// Run memory calibration
+#define TCLDBG_RUN_NON_DES_MEM_CALIBRATE 42
+
+//*****************************************************************************
+// TCL RX Status Codes
+//*****************************************************************************
+// RX interface waiting for command
 #define TCLDBG_RX_STATUS_WAIT_CMD 0
 
-/* RX interface command ready for operation. */
+// RX interface command ready for operation.
 #define TCLDBG_RX_STATUS_CMD_READY 1
 
-/* RX interface command executing */
+// RX interface command executing
 #define TCLDBG_RX_STATUS_CMD_EXE 2
 
-/******************************************************************************/
-/* TCL TX Status Codes  */
-/******************************************************************************/
-/* RX interface ready to accept commands in debug mode */
+//*****************************************************************************
+// TCL TX Status Codes
+//*****************************************************************************
+// RX interface ready to accept commands in debug mode
 #define TCLDBG_TX_STATUS_CMD_READY 0
 
-/* TX interface response not ready as command is running */
+// TX interface response not ready as command is running
 #define TCLDBG_TX_STATUS_CMD_EXE 1
 
-/* RX interface illegal command */
+// RX interface illegal command
 #define TCLDBG_TX_STATUS_ILLEGAL_CMD 2
 
-/* TX interface response ready */
+// TX interface response ready
 #define TCLDBG_TX_STATUS_RESPONSE_READY 3
 
 
 
-/******************************************************************************/
-/* Main report status bits  */
-/******************************************************************************/
+//*****************************************************************************
+// Main report status bits
+//*****************************************************************************
 #define DEBUG_STATUS_PRINTF_ENABLED_BIT 0
 #define DEBUG_STATUS_CALIBRATION_STARTED 1
 #define DEBUG_STATUS_CALIBRATION_ENDED 2
 
-/******************************************************************************/
-/* Individual reports status bits  */
-/******************************************************************************/
+//*****************************************************************************
+// Individual reports status bits
+//*****************************************************************************
 #define DEBUG_REPORT_STATUS_REPORT_READY 0x00000001
 #define DEBUG_REPORT_STATUS_REPORT_GEN_ENABLED 0x00000002
 #define DEBUG_REPORT_DTAP_PER_PTAP_DYNAMIC 0x00000004
 
-/******************************************************************************/
-/* Debug report sizes  */
-/******************************************************************************/
-#define NUM_RANK_MASK_WORDS ((RW_MGR_MEM_NUMBER_OF_RANKS % 32) == 0 ? \
-	(RW_MGR_MEM_NUMBER_OF_RANKS/32) : (RW_MGR_MEM_NUMBER_OF_RANKS/32)+1)
-#define NUM_GROUP_MASK_WORDS ((RW_MGR_MEM_IF_READ_DQS_WIDTH % 32) == 0 ? \
-	(RW_MGR_MEM_IF_READ_DQS_WIDTH/32) : (RW_MGR_MEM_IF_READ_DQS_WIDTH/32)+1)
+//*****************************************************************************
+// Debug report sizes
+//*****************************************************************************
+#define NUM_RANK_MASK_WORDS ((RW_MGR_MEM_NUMBER_OF_RANKS % 32) == 0 ? (RW_MGR_MEM_NUMBER_OF_RANKS/32) : (RW_MGR_MEM_NUMBER_OF_RANKS/32)+1)
+#define NUM_GROUP_MASK_WORDS ((RW_MGR_MEM_IF_READ_DQS_WIDTH % 32) == 0 ? (RW_MGR_MEM_IF_READ_DQS_WIDTH/32) : (RW_MGR_MEM_IF_READ_DQS_WIDTH/32)+1)
 
 #define COMMAND_PARAM_WORDS 4
 
-/******************************************************************************/
-/* Debug report structs  */
-/* Margins are reported in terms of delay chain taps.  */
-/******************************************************************************/
+//*****************************************************************************
+// Debug report structs
+// Margins are reported in terms of delay chain taps.
+//*****************************************************************************
 typedef struct debug_cal_observed_dq_margins_struct {
 	alt_32 left_edge;
 	alt_32 right_edge;
@@ -311,11 +313,11 @@ typedef struct debug_cal_status_per_group_struct {
 
 /* Summary report */
 typedef struct debug_summary_report_struct {
-	/* Size in 32-bit words of the report */
+	// Size in 32-bit words of the report
 	alt_u32 data_size;
 
 	alt_u32 report_flags;
-
+	
 	alt_u32 sequencer_signature;
 	alt_u32 protocol;
 
@@ -363,15 +365,13 @@ typedef struct debug_summary_report_struct {
 	alt_u32 groups_attempted_calibration[NUM_GROUP_MASK_WORDS];
 
 	alt_u32 computed_dtap_per_ptap;
-
-	/* The delay per phase tap is the period/dll_length */
+	// The delay per phase tap is the period/dll_length
 	alt_u32 io_delay_per_opa_tap;
-	/*
-	 * The delay per delay tap is the delay per phase tap
-	 * divided by the number of delay taps per phase tap
-	 * (i.e. io_delay_per_opa_tap / computed_dtap_per_ptap)
-	 * The value of computed_dtap_per_ptap is computed during calibration.
-	 */
+	// The delay per delay tap is the delay per phase tap
+	// divided by the number of delay taps per phase tap
+	// (i.e. io_delay_per_opa_tap / computed_dtap_per_ptap)
+	// The value of computed_dtap_per_ptap is computed during calibration.
+
 	alt_u32 margin_dq_in_left_delay_chain_len;
 	alt_u32 margin_dq_in_right_delay_chain_len;
 	alt_u32 margin_dq_out_left_delay_chain_len;
@@ -379,10 +379,9 @@ typedef struct debug_summary_report_struct {
 
 } debug_summary_report_t;
 
-	/* Calibration report:  The calibration status per group is here
-	(cal_status_per_group)*/
+/* Calibration report:  The calibration status per group is here (cal_status_per_group)*/
 typedef struct debug_cal_report_struct {
-	/* Size in 32-bit words of the report */
+	// Size in 32-bit words of the report
 	alt_u32 data_size;
 
 	alt_u32 report_flags;
@@ -394,37 +393,24 @@ typedef struct debug_cal_report_struct {
 	alt_u32 mem_write_dqs_width;
 
 	alt_u32 num_shadow_regs;
-
+	
 	/* Pass/fail status per group */
-	debug_cal_status_per_group_t cal_status_per_group[\
-		NUM_SHADOW_REGS][RW_MGR_MEM_IF_WRITE_DQS_WIDTH];
+	debug_cal_status_per_group_t cal_status_per_group[NUM_SHADOW_REGS][RW_MGR_MEM_IF_WRITE_DQS_WIDTH];
 
 	/* Margins observed before calibration.   */
-	debug_cal_observed_dq_margins_t cal_dq_in_margins[\
-		NUM_SHADOW_REGS][RW_MGR_MEM_DATA_WIDTH];
-	debug_cal_observed_dq_margins_t cal_dq_out_margins[\
-		NUM_SHADOW_REGS][RW_MGR_MEM_DATA_WIDTH];
-	debug_cal_observed_dq_margins_t cal_dm_margins[NUM_SHADOW_REGS][\
-		RW_MGR_MEM_IF_WRITE_DQS_WIDTH][\
-		RW_MGR_NUM_TRUE_DM_PER_WRITE_GROUP];
-	debug_cal_observed_dqsen_margins_t cal_dqsen_margins[NUM_SHADOW_REGS][\
-		RW_MGR_MEM_IF_READ_DQS_WIDTH];
+	debug_cal_observed_dq_margins_t cal_dq_in_margins[NUM_SHADOW_REGS][RW_MGR_MEM_DATA_WIDTH];
+	debug_cal_observed_dq_margins_t cal_dq_out_margins[NUM_SHADOW_REGS][RW_MGR_MEM_DATA_WIDTH];
+	debug_cal_observed_dq_margins_t cal_dm_margins[NUM_SHADOW_REGS][RW_MGR_MEM_IF_WRITE_DQS_WIDTH][RW_MGR_NUM_TRUE_DM_PER_WRITE_GROUP];
+	debug_cal_observed_dqsen_margins_t cal_dqsen_margins[NUM_SHADOW_REGS][RW_MGR_MEM_IF_READ_DQS_WIDTH];
 
-	debug_cal_observed_dqs_in_margins_t cal_dqs_in_margins[\
-		NUM_SHADOW_REGS][RW_MGR_MEM_IF_READ_DQS_WIDTH];
-	debug_cal_observed_dqs_out_margins_t cal_dqs_out_margins[\
-		NUM_SHADOW_REGS][RW_MGR_MEM_IF_WRITE_DQS_WIDTH];
-
+	debug_cal_observed_dqs_in_margins_t cal_dqs_in_margins[NUM_SHADOW_REGS][RW_MGR_MEM_IF_READ_DQS_WIDTH];
+	debug_cal_observed_dqs_out_margins_t cal_dqs_out_margins[NUM_SHADOW_REGS][RW_MGR_MEM_IF_WRITE_DQS_WIDTH];
+	
 	/* Phase, delay chain settings */
-	debug_cal_dq_settings_t cal_dq_settings[NUM_SHADOW_REGS][\
-		RW_MGR_MEM_DATA_WIDTH];
-	debug_cal_dqs_in_settings_t cal_dqs_in_settings[NUM_SHADOW_REGS][\
-		RW_MGR_MEM_IF_READ_DQS_WIDTH];
-	debug_cal_dqs_out_settings_t cal_dqs_out_settings[NUM_SHADOW_REGS][\
-		RW_MGR_MEM_IF_WRITE_DQS_WIDTH];
-	debug_cal_dm_settings_t cal_dm_settings[NUM_SHADOW_REGS][\
-		RW_MGR_MEM_IF_WRITE_DQS_WIDTH][\
-		RW_MGR_NUM_TRUE_DM_PER_WRITE_GROUP];
+	debug_cal_dq_settings_t cal_dq_settings[NUM_SHADOW_REGS][RW_MGR_MEM_DATA_WIDTH];
+	debug_cal_dqs_in_settings_t cal_dqs_in_settings[NUM_SHADOW_REGS][RW_MGR_MEM_IF_READ_DQS_WIDTH];
+	debug_cal_dqs_out_settings_t cal_dqs_out_settings[NUM_SHADOW_REGS][RW_MGR_MEM_IF_WRITE_DQS_WIDTH];
+	debug_cal_dm_settings_t cal_dm_settings[NUM_SHADOW_REGS][RW_MGR_MEM_IF_WRITE_DQS_WIDTH][RW_MGR_NUM_TRUE_DM_PER_WRITE_GROUP];
 
 } debug_cal_report_t;
 
@@ -434,29 +420,24 @@ typedef struct debug_margin_min_max_margins_struct {
 	alt_u32 max_working_setting;
 } debug_margin_min_max_margins_t;
 
-/* Post-calibration margin report (must be enabled using the
-TCLDBG_ENABLE_MARGIN_REPORT command first)*/
+/* Post-calibration margin report (must be enabled using the TCLDBG_ENABLE_MARGIN_REPORT command first)*/
 typedef struct debug_margin_report_struct {
-	/* Size in 32-bit words of the report */
+	// Size in 32-bit words of the report
 	alt_u32 data_size;
 
 	alt_u32 report_flags;
-
+	
 	alt_u32 mem_data_width;
 	alt_u32 mem_write_dqs_width;
 
 	alt_u32 num_shadow_regs;
 
-	debug_margin_min_max_margins_t margin_dm_margins[NUM_SHADOW_REGS][\
-		RW_MGR_MEM_IF_WRITE_DQS_WIDTH][\
-		RW_MGR_NUM_TRUE_DM_PER_WRITE_GROUP];
+	debug_margin_min_max_margins_t margin_dm_margins[NUM_SHADOW_REGS][RW_MGR_MEM_IF_WRITE_DQS_WIDTH][RW_MGR_NUM_TRUE_DM_PER_WRITE_GROUP];
 
-	debug_margin_min_max_margins_t margin_dq_in_margins[NUM_SHADOW_REGS][\
-		RW_MGR_MEM_DATA_WIDTH];
-	debug_margin_min_max_margins_t margin_dq_out_margins[NUM_SHADOW_REGS][\
-		RW_MGR_MEM_DATA_WIDTH];
-
-
+	debug_margin_min_max_margins_t margin_dq_in_margins[NUM_SHADOW_REGS][RW_MGR_MEM_DATA_WIDTH];
+	debug_margin_min_max_margins_t margin_dq_out_margins[NUM_SHADOW_REGS][RW_MGR_MEM_DATA_WIDTH];
+	
+	
 } debug_margin_report_t;
 
 typedef alt_u32 printf_read_buffer_t[PRINTF_READ_BUFFER_SIZE];
@@ -505,7 +486,7 @@ typedef struct rw_manager_di_report {
 } rw_manager_di_report_t;
 
 typedef struct emif_toolkit_debug_data {
-	/* Size in 32-bit words of all the emif toolkit debug data */
+	// Size in 32-bit words of all the emif toolkit debug data
 	alt_u32 data_size;
 
 	alt_u32 dqs_write_width_ptr;
@@ -520,43 +501,43 @@ typedef struct emif_toolkit_debug_data {
 
 /* This the main debug data structure.  This is where you write
 commands, poll command status, pass command parameters, etc.  Contained
-within this data structure are the reports. The memory address of this
+within this data structure are the reports. The memory address of this 
 data structure is in core_debug_defines.h (it is dynamic). For example:
 #define SEQ_CORE_DEBUG_BASE 0x000140c4
-The sizes of all the data structures are dynamic, as they depend on
+The sizes of all the data structures are dynamic, as they depend on 
 interface size and other parameters.  Accessing them outside a software
 context is trickier but it can be done by looking at the "data_size"
 field of the reports.
 */
 typedef struct debug_data_struct {
-	/* Size in 32-bit words of all the debug data */
+	// Size in 32-bit words of all the debug data
 	alt_u32 data_size;
 
-	/* Status bits */
+	// Status bits
 	alt_u32 status;
 
-	/* Command interaction */
+	// Command interaction
 	alt_u32 requested_command;
 	alt_u32 command_status;
 	alt_u32 command_parameters[COMMAND_PARAM_WORDS];
 
-	/* Pointers to the reports */
+	// Pointers to the reports
 	alt_u32 summary_report_ptr;
 	alt_u32 cal_report_ptr;
 	alt_u32 margin_report_ptr;
 
-	/* Printf output report */
+	// Printf output report
 	alt_u32 printf_output_ptr;
 
-	/* Debug toolkit debugging data */
+	// Debug toolkit debugging data
 	alt_u32 emif_toolkit_debug_data_ptr;
 
 #if ENABLE_DQSEN_SWEEP
-	/* di report */
+	// di report
 	alt_u32 di_report_ptr;
 #endif
 
-	/* Report data structures */
+	// Report data structures
 	debug_summary_report_t summary_report;
 	debug_cal_report_t cal_report;
 	debug_margin_report_t margin_report;
@@ -595,6 +576,6 @@ extern void tclrpt_dump_internal_data(void);
 extern void tclrpt_populate_fake_margin_data(void);
 #endif
 
-#endif /* ENABLE_TCL_DEBUG */
+#endif // ENABLE_TCL_DEBUG
 
 #endif
