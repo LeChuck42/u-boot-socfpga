@@ -697,15 +697,17 @@ void spl_board_init(void)
 		hang();
 #endif /* CONFIG_PRELOADER_HARDWARE_DIAGNOSTIC */
 
-#if (CONFIG_HPS_SDR_CTRLCFG_CTRLCFG_ECCEN == 1)
+#if (CONFIG_PRELOADER_SDRAM_SCRUBBING == 1)
+	/* scrub the boot region before copying happen */
+	sdram_scrub_boot_region();
+#if (CONFIG_PRELOADER_SDRAM_SCRUB_REMAIN_REGION == 1)
 	/*
-	 * Init the whole SDRAM ECC bit except the case when self refresh
-	 * is enabled and after a warm reset.
+	 * Trigger DMA to scrub remain region so it can run parallel
+	 * with flash loading to minimize the scrubbing time penalty
 	 */
-	if ((warmrst_preserve_sdram == 0) ||
-	   (rst_mgr_status & RSTMGR_COLDRST_MASK) != 0)
-		sdram_ecc_init();
-#endif
+	sdram_scrub_remain_region_trigger();
+#endif /* CONFIG_PRELOADER_SDRAM_SCRUB_REMAIN_REGION */
+#endif /* CONFIG_PRELOADER_SDRAM_SCRUBBING */
 
 #endif	/* CONFIG_PRELOADER_SKIP_SDRAM */
 
@@ -796,7 +798,6 @@ void spl_board_init(void)
 	 * Then it will program the FPGA with the loaded RBF file
 	 */
 	puts("FPGA : Programming FPGA\n");
-	reset_assert_all_bridges();
 #if defined(CONFIG_SPL_SPI_SUPPORT)
 	/* rbf file located within Quad SPI */
 	spl_program_fpga_qspi();
