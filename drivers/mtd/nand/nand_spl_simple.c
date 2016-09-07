@@ -247,33 +247,30 @@ static int nand_read_page(int block, int page, void *dst)
 
 int nand_spl_load_image(uint32_t offs, unsigned int size, void *dst)
 {
-	unsigned int block, lastblock;
+	unsigned int block;
 	unsigned int page;
 
 	/*
 	 * offs has to be aligned to a page address!
 	 */
 	block = offs / CONFIG_SYS_NAND_BLOCK_SIZE;
-	lastblock = (offs + size - 1) / CONFIG_SYS_NAND_BLOCK_SIZE;
 	page = (offs % CONFIG_SYS_NAND_BLOCK_SIZE) / CONFIG_SYS_NAND_PAGE_SIZE;
+	mtd.writesize = CONFIG_SYS_NAND_PAGE_SIZE;
+	mtd.oobsize = CONFIG_SYS_NAND_OOBSIZE;
+	while (size) {
+		nand_read_page(block, page, dst);
+		dst += CONFIG_SYS_NAND_PAGE_SIZE;
+		page++;
 
-	while (block <= lastblock) {
-		if (!nand_is_bad_block(block)) {
-			/*
-			 * Skip bad blocks
-			 */
-			while (page < CONFIG_SYS_NAND_PAGE_COUNT) {
-				nand_read_page(block, page, dst);
-				dst += CONFIG_SYS_NAND_PAGE_SIZE;
-				page++;
-			}
-
+		if (page >= CONFIG_SYS_NAND_PAGE_COUNT) {
 			page = 0;
-		} else {
-			lastblock++;
+			block++;
 		}
 
-		block++;
+		if (size > CONFIG_SYS_NAND_PAGE_SIZE)
+			size -= CONFIG_SYS_NAND_PAGE_SIZE;
+		else
+			break;
 	}
 
 	return 0;
