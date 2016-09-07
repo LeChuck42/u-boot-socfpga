@@ -43,5 +43,6 @@
 /* Define machine type for Cyclone 5 */
 #define CONFIG_MACH_TYPE 4251
 
+#define CONFIG_FIT			1
 
 #endif	/* __CONFIG_H */
